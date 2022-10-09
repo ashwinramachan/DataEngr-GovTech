@@ -1,0 +1,1 @@
+DDL, Query , Entity Releatioship taken from SQL server. Issues in my Postgres
