@@ -1,0 +1,5 @@
+#Schedule cron Job
+#crontab -e
+ 
+0 1 * * * python3 /usr/bin/DataPipeLine.py --input /usr/sourcedata/dataset1.csv --output /usr/destdata/output_dataset1.csv
+0 1 * * * python3 /usr/bin/DataPipeLine.py --input /usr/sourcedata/dataset2.csv --output /usr/destdata/output_dataset2.csv

@@ -1,0 +1,57 @@
+from unicodedata import name
+import pandas as pd
+import re
+
+# Source Location
+input_file_path = r"C:\Data\ram\dataset1.csv"
+# Processed Data Storing Location
+output_file_path = r"C:\Data\ram\output_dataset1.csv"
+
+# Read CSV file to DataFrame
+input_data = pd.read_csv(input_file_path)
+# Delete row if name empty in DataFrame
+input_data= input_data.dropna(subset=['name'])
+# Filter row if price !=0 in DataFrame
+input_data =input_data[input_data['price'] !=0]
+# Define List Prefix and Suffix
+LIST_OF_PREFIXES = ['Dr. ', 'Mr. ', 'Ms. ', 'Mrs. ', 'Miss ']
+LIST_OF_SUFFIXES = [' DDS', ' PhD', ' DVM', ' MD', ' Jr.', ' II', ' III', ' IV']
+
+first_name, last_name, price, above_100 = ([] for x in range(4))
+
+# Looping iterrows dataframe
+for index, row in input_data.iterrows():
+
+    if not row['name']:
+        continue
+
+    raw_name = row['name']
+    price.append(float(row['price']))
+    
+    raw_name = re.sub(' +', ' ', raw_name)
+    raw_name = raw_name.strip()
+    name_size = len(raw_name)
+# Prefix Remove
+    for x in LIST_OF_PREFIXES:
+        if raw_name.startswith(x):
+            raw_name = raw_name[len(x):]
+    name_size = len(raw_name)
+# Suffix Remove
+    for y in LIST_OF_SUFFIXES:
+        if raw_name.endswith(y):
+            raw_name = raw_name[:name_size-len(y)]
+
+    first_name.append(raw_name.split(' ')[0])
+    last_name.append(raw_name.split(' ')[1])
+
+    if float(row['price']) > 100:
+        above_100.append(True)
+    else:
+        above_100.append(False)
+
+# Collect data
+output_data = list(zip(first_name, last_name, price, above_100))
+# Convert Dataframe
+output_df = pd.DataFrame(output_data, columns=['first_name', 'last_name', 'price', 'above_100'])
+# Write Dataframe to CSV
+output_df.to_csv(output_file_path)

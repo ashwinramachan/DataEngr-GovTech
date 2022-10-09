@@ -1,0 +1,45 @@
+import pandas as pd
+
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
+from sklearn.preprocessing import LabelEncoder
+from sklearn.ensemble import RandomForestClassifier
+
+
+if __name__ == "__main__":
+    # read data
+    df = pd.read_csv('C:/Data/ram/car.csv', names=['buying', 'maint', 'doors', 'persons', 'lug_boot', 'safety', 'class'])
+    print("Read data into Pandas DataFrame:")
+    print(df.head(), end="\n\n")
+
+    # separate features and label
+    feature_list = ['maint', 'doors', 'lug_boot', 'safety', 'class']
+    X = df[feature_list]
+    y = df['buying']
+
+    # encode features and label
+    le_X = {}
+    for feature in feature_list:
+        le = LabelEncoder()
+        X[feature] = le.fit_transform(X[feature])
+        le_X[feature] = le
+    lby = LabelEncoder()
+    y = lby.fit_transform(y)
+
+    # train data
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=0)
+    clf = RandomForestClassifier(criterion='entropy', max_depth=3, n_estimators=300, random_state=0)
+    clf = clf.fit(X_train, y_train)
+    y_pred = clf.predict(X_test)
+    print("Classification report for the ML model:")
+    print(classification_report(y_test, y_pred))
+
+    # predict label for the test case
+    X_to_pred = df = pd.DataFrame([['high', '4', 'big', 'high', 'good']], columns=feature_list)
+    # encode feature
+    for feature in feature_list:
+        le = le_X[feature]
+        X_to_pred[feature] = le.transform(X_to_pred[feature])
+    y_res = clf.predict(X_to_pred)
+    y_res = lby.inverse_transform(y_res)
+    print(y_res[0])

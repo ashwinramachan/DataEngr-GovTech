@@ -1,0 +1,40 @@
+import json
+import requests
+import plotly.graph_objects as graph
+
+
+def plot_chart(case_type):
+    # Take data from API
+    source = requests.get('https://api.covid19api.com/country/singapore/status/{}'.format(case_type))
+    source_data = json.loads(source.text)
+    # preprocess data
+    cases = []
+    dates = []
+    for row in source_data:
+        cases.append(row['Cases'])
+        dates.append(row['Date'])
+    # graph process
+    figure = graph.Figure(
+        [graph.Scatter(x=dates, y=cases, yhoverformat=",.2d")],
+        layout=graph.Layout(
+            title='COVID-19 {} Cases'.format(case_type.capitalize()),
+            xaxis=dict(
+                tickmode='linear',
+                dtick="M3",
+            ),
+            yaxis=dict(
+                tickmode='linear',
+                tick0=0,
+                dtick=200000 if case_type == "confirmed" else 200,
+            ),
+            yaxis_tickformat=",.2d"
+        )
+
+    )
+    figure.show()
+
+
+
+if __name__ == "__main__":
+    plot_chart("confirmed")
+    plot_chart("deaths")
